@@ -1,0 +1,14 @@
+{
+  "name": "book-scraper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.1",
+    "node-fetch": "^3.3.2"
+  }
+}
