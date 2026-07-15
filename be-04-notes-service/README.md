@@ -1,36 +1,15 @@
 # BE-04 Notes Service
 
-## Step 7: Persistence proof
+## Authentication flow
 
-The service was verified locally before the Docker-based steps.
+This service now supports user registration, login, and a protected notes route. Register with POST /register, log in with POST /login, and call GET /notes with a Bearer token to access the protected route.
 
-### Commands run
+### Example requests
 
 ```bash
-node server.js
+curl -X POST http://localhost:3000/register -H "Content-Type: application/json" -d '{"username":"testuser","password":"pass123"}'
+curl -X POST http://localhost:3000/login -H "Content-Type: application/json" -d '{"username":"testuser","password":"pass123"}'
+curl -X GET http://localhost:3000/notes -H "Authorization: Bearer <token>"
 ```
 
-```powershell
-$body = @{ content = 'First note' } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:3000/notes' -ContentType 'application/json' -Body $body
-```
-
-```powershell
-Invoke-RestMethod -Method Get -Uri 'http://127.0.0.1:3000/notes'
-```
-
-### What was observed
-
-- POST /notes returned a created note with an id and created_at timestamp.
-- GET /notes returned the stored note.
-
-## Persistence Verification
-
-1. Created a note via POST /notes: {"content": "first note test"}
-2. Confirmed it via GET /notes
-3. Restarted the full stack with `docker compose down` then `docker compose up`
-4. Ran GET /notes again — the note was still present, confirming Postgres data persisted across a container restart via the Docker volume.
-
-### Note on repository swap
-
-The implementation was designed so that switching from the in-memory repository to the Postgres repository required changing only the repository wiring in server.js. The files routes.js and noteService.js were not modified during that swap.
+Passwords are hashed with bcryptjs and tokens are signed with JSON Web Tokens (JWT). The protected route returns 401 for missing/invalid credentials and 403 for tokens that do not map to a known user.
